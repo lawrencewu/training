@@ -10,34 +10,22 @@ public class Utils {
     private static Pattern yearPattern = Pattern.compile("\\d{1,4}");
     private static Pattern monthPattern = Pattern.compile("\\d{1}|11|12");
     public static void verify(String s) {
-        try{
             if(s.isEmpty() || s == null)
-                throw new Exception("Date cannot be empty");
+                 new Exception("Date cannot be empty");
             if(!datePattern.matcher(s).matches())
-                throw new Exception("Date format is wrong");
-        }catch(Exception ex){
-
-        }
+                 new Exception("Date format is wrong");
     }
 
     public static  void verifyYear(int year){
-        try{
             if(year < 1 )
-                throw new Exception("Year cannot be less than 1");
+                 new Exception("Year cannot be less than 1");
             if(!yearPattern.matcher(year + "").matches())
-                throw new Exception("Year format is wrong");
-        }catch(Exception ex){
-
-        }
+                 new Exception("Year format is wrong");
     }
 
     public static  void verifyMonth(int month){
-        try {
             if (!monthPattern.matcher(month + "").matches())
-                throw new Exception("Month format is wrong");
-        }catch (Exception ex){
-
-        }
+                 new Exception("Month format is wrong");
     }
 }
 
