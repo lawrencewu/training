@@ -1,4 +1,4 @@
-/* SList.java */
+package com.training.dt.lesson;
 
 /**
  *  The SList class is a singly-linked implementation of the linked list
@@ -111,6 +111,17 @@ public class SList {
    **/
 
   public void squish() {
+      SListNode p = head, currentNode = head;
+      while(currentNode != null && currentNode.next != null){
+          currentNode = currentNode.next;
+          if(currentNode.item.equals(p.item)){
+              p.next = currentNode.next;
+              size --;
+              continue;
+          }
+          p.next = currentNode;
+          p = currentNode;
+      }
     // Fill in your solution here.  (Ours is eleven lines long.)
   }
 
@@ -126,6 +137,13 @@ public class SList {
    **/
 
   public void twin() {
+      SListNode currentNode = head;
+      while (currentNode != null){
+          SListNode node = new SListNode(currentNode.item, currentNode.next);
+          currentNode.next = node;
+          currentNode = node.next;
+          size ++;
+      }
     // Fill in your solution here.  (Ours is seven lines long.)
   }
 

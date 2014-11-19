@@ -1,4 +1,4 @@
-/* Homework3.java */
+package com.training.dt.lesson;
 
 public class Homework3 {
 
@@ -19,8 +19,24 @@ public class Homework3 {
    **/
 
   public static void smoosh(int[] ints) {
-    // Fill in your solution here.  (Ours is twelve lines long, not counting
-    // blank lines or lines already present in this file.)
+      //too bad,think twice later
+      int [] temp = new int[ints.length];
+      int previous = Integer.MAX_VALUE;
+      int current = 0;
+      for (int i=0;i<ints.length; i++){
+          if(ints[i] == previous)
+              continue;
+          else{
+              temp[current ++] = ints[i];
+              previous = ints[i];
+          }
+      }
+      for (int i = 0; i< ints.length; i++) {
+          if (i < current)
+              ints[i] = temp[i];
+          else
+              ints[i] = -1;
+      }
   }
 
   /**
@@ -45,10 +61,7 @@ public class Homework3 {
   public static void main(String[] args) {
     String result;
     int i;
-
-
     System.out.println("Let's smoosh arrays!\n");
-
     int[] test1 = {3, 7, 7, 7, 4, 5, 5, 2, 0, 8, 8, 8, 8, 5};
     System.out.println("smooshing " + stringInts(test1) + ":");
     smoosh(test1);

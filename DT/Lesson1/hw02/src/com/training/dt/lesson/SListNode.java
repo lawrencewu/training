@@ -1,4 +1,4 @@
-/* SListNode.java */
+package com.training.dt.lesson;
 
 /**
  *  SListNode is a class used internally by the SList class.  An SList object

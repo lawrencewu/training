@@ -1,4 +1,4 @@
-/* TestHelper.java */
+package com.training.dt.lesson;
 
 /**
  *  The purpose of this class is to provide a shorthand for writing and testing
