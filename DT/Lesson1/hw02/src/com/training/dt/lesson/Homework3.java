@@ -20,6 +20,7 @@ public class Homework3 {
 
   public static void smoosh(int[] ints) {
       //too bad,think twice later
+
       int [] temp = new int[ints.length];
       int previous = Integer.MAX_VALUE;
       int current = 0;
