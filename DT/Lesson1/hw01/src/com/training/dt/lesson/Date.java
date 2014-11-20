@@ -28,15 +28,7 @@ class Date {
      * a valid date, the program halts with an error message.
      */
     public Date(String s) {
-        try {
-            Utils.verify(s);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        String[] params = s.split("/");
-        this.month = Integer.parseInt(params[0]);
-        this.day = Integer.parseInt(params[1]);
-        this.year = Integer.parseInt(params[2]);
+
     }
     /** Checks whether the given year is a leap year.
      * @return true if and only if the input year is a leap year.
@@ -53,29 +45,9 @@ class Date {
      * @return the number of days in the given month.
      */
     public static int daysInMonth(int month, int year) {
-        Utils.verifyYear(year);
-        Utils.verifyMonth(month);
+
         int daysInMonth = -1;
-        switch (month){
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12: daysInMonth = 31; break;
-            case 2:
-                if(isLeapYear(year))
-                    daysInMonth = 29;
-                else
-                    daysInMonth = 28;
-                break;
-            case 4:
-            case 6:
-            case 9:
-            case 11:daysInMonth = 30;break;
-            default: daysInMonth = -1;
-        }
+
         return daysInMonth;
     }
     /** Checks whether the given date is valid.
@@ -84,28 +56,7 @@ class Date {
      * Years prior to A.D. 1 are NOT valid.
      */
     public static boolean isValidDate(int month, int day, int year) {
-        int days = daysInMonth(month, year);
-        if(days == -1)
-            return false;
-        switch (month){
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12: return days >1 && days <= 31;
-            case 2:
-                if(isLeapYear(year))
-                    return days >1 && days <= 29;
-                else
-                    return days >1 && days <= 28;
-            case 4:
-            case 6:
-            case 9:
-            case 11:return days >1 && days <= 30;
-            default: return false;
-        }
+        return true;
     }
     /** Returns a string representation of this date in the form month/day/year.
      * The month, day, and year are expressed in full as integers; for example,
@@ -119,26 +70,15 @@ class Date {
      * @return true if and only if this Date is before d.
      */
     public boolean isBefore(Date d) {
-        if(this.year < d.year) {
-            return true;
-        }
-        else {
-            if (this.month < d.month) {
-                return false;
-            } else{
-                if(this.day < d.day)
-                    return true;
-            }
-        }
+
         return false; // replace this line with your solution
     }
     /** Determines whether this Date is after the Date d.
      * @return true if and only if this Date is after d.
      */
     public boolean isAfter(Date d) {
-        if(equals(d))
+
             return false;
-        return !isBefore(d);
     }
     /** Returns the number of this Date in the year.
      * @return a number n in the range 1...366, inclusive, such that this Date
@@ -146,27 +86,8 @@ class Date {
      * year.)
      */
     public int dayInYear() {
-        int february = 0;
-        if(isLeapYear(year))
-            february = 29;
-        else
-            february = 28;
-        int days = 0;
-        switch (month){
-            case 1: days = day;break;
-            case 2: days = 31 + day;break;
-            case 3: days = 31 + february + day;break;
-            case 4: days = 31 + february + 31 +day; break;
-            case 5: days = 31 + february + 31 + 30 + day; break;
-            case 6: days = 31 + february + 31 + 30 + 31 + day; break;
-            case 7: days = 31 + february + 31 + 30 + 31 + +30 + day; break;
-            case 8: days = 31 + february + 31 + 30 + 31 + +30 + 31 + day; break;
-            case 9: days = 31 + february + 31 + 30 + 31 + +30 + 31 + 31 + day; break;
-            case 10: days = 31 + february + 31 + 30 + 31 + +30 + 31 + 31 + 30 + day; break;
-            case 11: days = 31 + february + 31 + 30 + 31 + +30 + 31 + 31 + 30 + 31 + day; break;
-            case 12: days = 31 + february + 31 + 30 + 31 + +30 + 31 + 31 + 30 + 31 + 30 + day; break;
-        }
-        return  days;
+
+        return  0;
     }
     /** Determines the difference in days between d and this Date. For example,
      * if this Date is 12/15/2012 and d is 12/14/2012, the difference is 1.
@@ -174,35 +95,8 @@ class Date {
      * @return the difference in days between d and this date.
      */
     public int difference(Date d) {
-        int sum = 0;
-        if(equals(d)) return sum;
-        int diffYear = this.year - d.year;
-        if(isAfter(d)){
-            if(isLeapYear(d.year)){
-                sum += (366 - d.dayInYear());
-            }else {
-                sum += (365 - d.dayInYear());
-            }
-            for (int i = 1;i < Math.abs(diffYear);i++){
-                Date date = new Date(12 , 31, d.year + i);
-                sum += date.dayInYear();
-            }
-            sum += dayInYear();
-        }else{
-            if(isLeapYear(year)){
-                sum += (366 - dayInYear());
-            }else {
-                sum += (365 - dayInYear());
-            }
-            for (int i = 1;i < Math.abs(diffYear);i++){
-                Date date = new Date(12 , 31, year + i);
-                sum += date.dayInYear();
-            }
-            sum += d.dayInYear();
-            sum = -sum;
-        }
 
-        return sum;
+        return 0;
     }
 
     public boolean equals(Date d){
