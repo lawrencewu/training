@@ -21,8 +21,6 @@
  *  See the README file accompanying this project for additional details.
  */
 
-import java.util.Iterator;
-
 public class RunLengthEncoding implements Iterable {
 
   /**
@@ -30,8 +28,11 @@ public class RunLengthEncoding implements Iterable {
    *  These variables MUST be private.
    */
 
+   private int width;
+   private int height;
 
-
+   private PixImage pixImage;
+   private RunList runList;
 
   /**
    *  The following methods are required for Part II.
@@ -47,7 +48,11 @@ public class RunLengthEncoding implements Iterable {
    */
 
   public RunLengthEncoding(int width, int height) {
-    // Your solution here.
+      // Your solution here.
+      if(width < 0 || height < 0)
+          throw  new IllegalArgumentException();
+      pixImage = new PixImage(width, height);
+      runList = new RunList();
   }
 
   /**
@@ -71,11 +76,42 @@ public class RunLengthEncoding implements Iterable {
    *  conditions are not met--though we won't be testing that.)
    */
 
-  public RunLengthEncoding(int width, int height, int[] red, int[] green,
-                           int[] blue, int[] runLengths) {
+  public RunLengthEncoding(int width, int height, int[] red, int[] green,int[] blue, int[] runLengths) {
     // Your solution here.
+      checkArgument(red, green, blue, runLengths);
+      for (int i = 0; i < width; i++) {
+          for (int j = 0; j < height; j++) {
+              //if(PixImage.Pixel)
+          }
+      }
   }
 
+  private void checkArgument(int[] red, int[] green,int[] blue, int[] runLengths){
+      checkIntensities(red);
+      checkIntensities(green);
+      checkIntensities(blue);
+      if(runLengths.length < 0)
+          throw  new IllegalArgumentException("Param size cannot be less than 0");
+      if(red.length != green.length && red.length != blue.length && red.length != runLengths.length)
+          throw  new IllegalArgumentException("All four input arrays should have the same length (not zero)");
+      int sum = 0;
+      for (int i = 0; i < runLengths.length; i++) {
+          sum += runLengths[i];
+      }
+      if(sum != width * height)
+          throw  new IllegalArgumentException("The sum of all the elements of the runLengths array should be width * height.");
+  }
+
+  private void checkIntensities(int[] color){
+      if(color.length <= 0){
+          throw  new IllegalArgumentException("Param size cannot be less than 1");
+      }
+      for (int i = 0; i < color.length; i++) {
+          if(color[i] < 0 || color[i] > 255){
+              throw  new IllegalArgumentException("Intensity should be in 0 and 255");
+          }
+      }
+  }
   /**
    *  getWidth() returns the width of the image that this run-length encoding
    *  represents.
@@ -85,7 +121,7 @@ public class RunLengthEncoding implements Iterable {
 
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return this.width;
   }
 
   /**
@@ -96,7 +132,7 @@ public class RunLengthEncoding implements Iterable {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return this.height;
   }
 
   /**

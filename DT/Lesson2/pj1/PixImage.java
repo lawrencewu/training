@@ -1,5 +1,8 @@
 /* PixImage.java */
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *  The PixImage class represents an image, which is a rectangular grid of
  *  color pixels.  Each pixel has red, green, and blue intensities in the range
@@ -22,10 +25,12 @@ public class PixImage {
    *  variables MUST be private.
    */
 
-
-
-
-  /**
+    private int width;
+    private int height;
+    private Pixel[][] pixels;
+    private final short[][] xVector = new short[][] {{-1,0,1},{-2,0,2},{-1,0,1}};
+    private final short[][] yVector = new short[][] {{1,2,1},{0,0,0},{-1,-2,-1}};
+    /**
    * PixImage() constructs an empty PixImage with a specified width and height.
    * Every pixel has red, green, and blue intensities of zero (solid black).
    *
@@ -34,6 +39,15 @@ public class PixImage {
    */
   public PixImage(int width, int height) {
     // Your solution here.
+      this.width = width;
+      this.height = height;
+      pixels = new Pixel[width][height];
+      for (int i = 0; i < width; i++) {
+          for (int j = 0; j < height; j++) {
+              Color c = new Color((short)0, (short)0, (short)0);
+              pixels[i][j] = new Pixel(i, j, c);
+          }
+      }
   }
 
   /**
@@ -43,7 +57,7 @@ public class PixImage {
    */
   public int getWidth() {
     // Replace the following line with your solution.
-    return 1;
+    return this.width;
   }
 
   /**
@@ -53,7 +67,7 @@ public class PixImage {
    */
   public int getHeight() {
     // Replace the following line with your solution.
-    return 1;
+    return this.height;
   }
 
   /**
@@ -65,7 +79,7 @@ public class PixImage {
    */
   public short getRed(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+      return pixels[x][y].getColor().getRed();
   }
 
   /**
@@ -77,7 +91,7 @@ public class PixImage {
    */
   public short getGreen(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return pixels[x][y].getColor().getGreen();
   }
 
   /**
@@ -89,7 +103,7 @@ public class PixImage {
    */
   public short getBlue(int x, int y) {
     // Replace the following line with your solution.
-    return 0;
+    return pixels[x][y].getColor().getBlue();
   }
 
   /**
@@ -106,7 +120,11 @@ public class PixImage {
    * @param blue the new blue intensity for the pixel at coordinate (x, y).
    */
   public void setPixel(int x, int y, short red, short green, short blue) {
-    // Your solution here.
+      // Your solution here.
+      if( red < 0 || red > 255 || green < 0 || green > 255 || blue < 0 || blue >255 )
+          return;
+      Color c = new Color(green, red, blue);
+      pixels[x][y] = new Pixel(x, y, c);
   }
 
   /**
@@ -120,7 +138,17 @@ public class PixImage {
    */
   public String toString() {
     // Replace the following line with your solution.
-    return "";
+    StringBuilder sb = new StringBuilder();
+    for (int x =0; x< width; x++){
+        for (int y = 0; y < height; y++) {
+            sb.append(String.format("{%s,%s}", x, y));
+            sb.append("( " + getRed(x,y));
+            sb.append(" " + getGreen(x,y));
+            sb.append(" " + getBlue(x,y) + " )");
+            sb.append("\n");
+        }
+    }
+    return sb.toString();
   }
 
   /**
@@ -153,8 +181,44 @@ public class PixImage {
    * @return a blurred version of "this" PixImage.
    */
   public PixImage boxBlur(int numIterations) {
-    // Replace the following line with your solution.
-    return this;
+      if(numIterations <= 0)
+          return this;
+      PixImage first = new PixImage(width, height);
+      for (int i = 0; i < width; i++) {
+          for (int j = 0; j < height; j++) {
+              Color c = this.getAvg(i, j);
+              first.setPixel(i, j, (short)c.getRed(),(short)c.getGreen(), (short)c.getBlue());
+          }
+      }
+      for (int k = 1; k < numIterations; k++) {
+          PixImage second = new PixImage(width, height);
+          for (int i = 0; i < width; i++) {
+              for (int j = 0; j < height; j++) {
+                  Color c = first.getAvg(i, j);
+                  second.setPixel(i, j, (short)c.getRed(), (short)c.getGreen(), (short)c.getBlue());
+              }
+          }
+          first = second;
+      }
+    return first;
+  }
+
+  private Color getAvg(int x, int y){
+      int green =0, red =0, blue =0,  count = 0;
+      for (int i = x -1; i < x + 2; i++) {
+          if(i >= 0 && i < this.width) {
+              for (int j = y - 1; j < y + 2; j++) {
+                  if (j >= 0 && j < this.height) {
+                      green += getGreen(i, j);
+                      blue += getBlue(i ,j);
+                      red += getRed(i ,j);
+                      count ++;
+                  }
+              }
+          }
+      }
+      Color c = new Color((short)(green/count), (short)(red/count), (short)(blue/count));
+      return  c;
   }
 
   /**
@@ -190,6 +254,7 @@ public class PixImage {
    * gradients at each pixel.  We convert the squared magnitude at each pixel
    * into a grayscale pixel intensity in the range 0...255 with the logarithmic
    * mapping encoded in mag2gray().  The output is a grayscale PixImage whose
+   * +
    * pixel intensities reflect the strength of the edges.
    *
    * See http://en.wikipedia.org/wiki/Sobel_operator#Formulation for details.
@@ -199,11 +264,76 @@ public class PixImage {
    */
   public PixImage sobelEdges() {
     // Replace the following line with your solution.
-    return this;
+    //return this;
     // Don't forget to use the method mag2gray() above to convert energies to
     // pixel intensities.
+      PixImage sobledImage = new PixImage(width, height);
+      for (int i=0; i< width; i++){
+          for (int j = 0; j < height; j++) {
+              short intensities = mag2gray(energy(i, j));
+              sobledImage.setPixel(i, j, intensities, intensities, intensities);
+          }
+      }
+      return sobledImage;
   }
 
+   private long energy(int x, int y){
+       List<Gradient> gradients = getGradient(x, y);
+      if(gradients == null || gradients.size() == 0)
+          throw new RuntimeException("Cannot get the gradient");
+      long energy = 0L;
+      for (Gradient e : gradients){
+         energy += e.getGx() * e.getGx() + e.getGy() * e.getGy();
+      }
+      return energy;
+   }
+
+   private  List<Gradient> getGradient(int x, int y){
+       Color[][] colors = getNeighbors(x, y);
+       if(colors == null)
+           throw new RuntimeException("Cannot get the colors");
+       List<Gradient> gradients = new ArrayList<Gradient>();
+       long gxRed =0L, gxGreen=0L, gxBlue =0L, gyRed =0L, gyGreen=0L, gyBlue =0L;
+       for (int i = 0; i < 3; i++) {
+           for (int j = 0; j < 3; j++) {
+               gxRed += (long)(colors[i][j].getRed() * xVector[i][j]);
+               gxGreen += (long)colors[i][j].getGreen() * xVector[i][j];
+               gxBlue += (long)colors[i][j].getRed() * xVector[i][j];
+
+               gyRed += (long)colors[i][j].getRed() * yVector[i][j];
+               gyGreen += (long)colors[i][j].getGreen() * yVector[i][j];
+               gyBlue += (long)colors[i][j].getRed() * yVector[i][j];
+           }
+       }
+       gradients.add(new Gradient(gxRed, gyRed));
+       gradients.add(new Gradient(gxBlue, gyBlue));
+       gradients.add(new Gradient(gxGreen, gyGreen));
+       return gradients;
+   }
+
+   private Color[][] getNeighbors(int x, int y){
+       Color[][] colors = new Color[3][3];
+       for (int i = 0; i < 3; i++) {
+           int xCoordinate = x + i -1;
+           if(xCoordinate < 0) {
+               xCoordinate = 0;
+           }
+           else if(xCoordinate >= width) {
+               xCoordinate = width - 1;
+           }
+           for (int j = 0; j < 3; j++) {
+               int yCoordinate = y +j -1;
+               if(yCoordinate < 0) {
+                   yCoordinate = 0;
+               }
+               else if(yCoordinate >= height) {
+                   yCoordinate = height - 1;
+               }
+                   colors[i][j] = pixels[xCoordinate][yCoordinate].getColor();
+           }
+       }
+       return colors;
+   }
 
   /**
    * TEST CODE:  YOU DO NOT NEED TO FILL IN ANY METHODS BELOW THIS POINT.
@@ -318,7 +448,7 @@ public class PixImage {
            "Incorrect Sobel:\n" + image1.sobelEdges());
 
 
-    PixImage image2 = array2PixImage(new int[][] { { 0, 100, 100 },
+   PixImage image2 = array2PixImage(new int[][] { { 0, 100, 100 },
                                                    { 0, 0, 100 } });
     System.out.println("Testing getWidth/getHeight on a 2x3 image.  " +
                        "Input image:");
@@ -338,4 +468,62 @@ public class PixImage {
                                         { 74, 143, 122 } })),
            "Incorrect Sobel:\n" + image2.sobelEdges());
   }
+    public static class Color{
+        private short green;
+        private short red;
+        private short blue;
+        public  Color(short green, short red, short blue){
+            this.green = green;
+            this.red = red;
+            this.blue = blue;
+        }
+
+        public short getGreen(){
+            return this.green;
+        }
+
+        public short getRed(){
+            return  this.red;
+        }
+
+        public short getBlue(){
+            return this.blue;
+        }
+
+        public boolean equals(Color c){
+            return this.red==c.getRed() && this.green == c.green && this.blue == c.blue;
+        }
+    }
+
+    public static class Pixel{
+        private int x;
+        private int y;
+        private Color c;
+        public  Pixel(int x, int y, Color c){
+            this.x = x;
+            this.y = y;
+            this.c = c;
+        }
+        public int getX(){
+            return this.x;
+        }
+        public int getY(){
+            return this.y;
+        }
+
+        public Color getColor(){
+            return this.c;
+        }
+    }
+
+    public static class Gradient{
+       private Long gx;
+       private Long gy;
+       public Gradient(Long gx, Long gy){
+           this.gx = gx;
+           this.gy = gy;
+       }
+       public Long getGx(){return gx;}
+       public Long getGy(){return gy;}
+    }
 }
