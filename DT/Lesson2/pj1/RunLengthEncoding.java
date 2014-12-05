@@ -30,10 +30,7 @@ public class RunLengthEncoding implements Iterable {
 
    private int width;
    private int height;
-
-   private PixImage pixImage;
    private RunList runList;
-
   /**
    *  The following methods are required for Part II.
    */
@@ -51,8 +48,9 @@ public class RunLengthEncoding implements Iterable {
       // Your solution here.
       if(width < 0 || height < 0)
           throw  new IllegalArgumentException();
-      pixImage = new PixImage(width, height);
-      runList = new RunList();
+      runList = new RunList(new PixImage.Color[]{new PixImage.Color((short)0, (short)0, (short)0)}, new int[]{width * height});
+      this.width = width;
+      this.height = height;
   }
 
   /**
@@ -79,11 +77,14 @@ public class RunLengthEncoding implements Iterable {
   public RunLengthEncoding(int width, int height, int[] red, int[] green,int[] blue, int[] runLengths) {
     // Your solution here.
       checkArgument(red, green, blue, runLengths);
-      for (int i = 0; i < width; i++) {
-          for (int j = 0; j < height; j++) {
-              //if(PixImage.Pixel)
-          }
+      PixImage.Color[] colors = new PixImage.Color[red.length];
+      for (int i = 0; i < red.length; i++) {
+          PixImage.Color c = new PixImage.Color((short)green[i], (short)red[i], (short)blue[i]);
+          colors[i] = c;
       }
+      runList = new RunList(colors, runLengths);
+      this.width = width;
+      this.height = height;
   }
 
   private void checkArgument(int[] red, int[] green,int[] blue, int[] runLengths){
@@ -144,7 +145,8 @@ public class RunLengthEncoding implements Iterable {
    */
   public RunIterator iterator() {
     // Replace the following line with your solution.
-    return null;
+    //Run run = runList.head;
+    return new RunIterator(runList.head);
     // You'll want to construct a new RunIterator, but first you'll need to
     // write a constructor in the RunIterator class.
   }
@@ -157,7 +159,22 @@ public class RunLengthEncoding implements Iterable {
    */
   public PixImage toPixImage() {
     // Replace the following line with your solution.
-    return new PixImage(1, 1);
+      PixImage image = new PixImage(width, height);
+      RunIterator iterator = iterator();
+      int x = 0, y =0, mod = 0;
+      while (iterator.hasNext()){
+          int[] arr = iterator.next();
+          for (int i = 0; i < arr[0]; i++) {
+              image.setPixel(x, y, (short)arr[1], (short)arr[2], (short)arr[3]);
+              if(x < width -1 ){
+                  x ++;
+              }else {
+                  x = 0;
+                  y++;
+              }
+          }
+      }
+      return image;
   }
 
   /**
@@ -191,6 +208,32 @@ public class RunLengthEncoding implements Iterable {
   public RunLengthEncoding(PixImage image) {
     // Your solution here, but you should probably leave the following line
     // at the end.
+      if(image == null)
+          return;
+
+      this.width = image.getWidth();
+      this.height = image.getHeight();
+      runList = new RunList();
+      PixImage.Pixel[][] pixels = image.getPixels();
+      PixImage.Color prev = pixels[0][0].getColor();
+      PixImage.Color current = null;
+      int sum = 0;
+      for (int i = 0; i < image.getHeight(); i++) {
+          for (int j = 0; j < image.getWidth(); j++) {
+             current = pixels[j][i].getColor();
+             if(prev.equals(current)){
+                  sum ++;
+              }else {
+                 runList.add(prev, sum);
+                 prev = current;
+                 sum = 1;
+             }
+        }
+      }
+      //for the last single pixel
+      if(sum == 1) {
+        runList.add(current, sum);
+      }
     check();
   }
 
@@ -201,6 +244,23 @@ public class RunLengthEncoding implements Iterable {
    */
   public void check() {
     // Your solution here.
+    RunIterator iterator = iterator();
+    int[] node = iterator.hasNext() ? iterator.next() : null;
+    if(node == null)
+        return;
+    int sum = node[0];
+    while (iterator.hasNext())
+    {
+        int[] current = iterator.next();
+        sum += current[0];
+        if(node[1] == current[1] && node[2] == current[2] && node[3] == current[3]){
+            throw new RuntimeException("Runs have the same RGB intensities");
+        }
+        node = current;
+    }
+    if(sum != width * height){
+        throw new RuntimeException("The sum of all run lengths does not equal the number of pixels in the image");
+    }
   }
 
 
@@ -224,6 +284,7 @@ public class RunLengthEncoding implements Iterable {
   public void setPixel(int x, int y, short red, short green, short blue) {
     // Your solution here, but you should probably leave the following line
     //   at the end.
+
     check();
   }
 
@@ -294,21 +355,21 @@ public class RunLengthEncoding implements Iterable {
    * main() runs a series of tests of the run-length encoding code.
    */
   public static void main(String[] args) {
-    // Be forwarned that when you write arrays directly in Java as below,
-    // each "row" of text is a column of your image--the numbers get
-    // transposed.
-    PixImage image1 = array2PixImage(new int[][] { { 0, 3, 6 },
-                                                   { 1, 4, 7 },
-                                                   { 2, 5, 8 } });
+      // Be forwarned that when you write arrays directly in Java as below,
+      // each "row" of text is a column of your image--the numbers get
+      // transposed.
+      PixImage image1 = array2PixImage(new int[][]{{0, 3, 6},
+              {1, 4, 7},
+              {2, 5, 8}});
 
-    System.out.println("Testing one-parameter RunLengthEncoding constuctor " +
-                       "on a 3x3 image.  Input image:");
-    System.out.print(image1);
-    RunLengthEncoding rle1 = new RunLengthEncoding(image1);
-    rle1.check();
-    System.out.println("Testing getWidth/getHeight on a 3x3 encoding.");
-    doTest(rle1.getWidth() == 3 && rle1.getHeight() == 3,
-           "RLE1 has wrong dimensions");
+      System.out.println("Testing one-parameter RunLengthEncoding constuctor " +
+              "on a 3x3 image.  Input image:");
+      System.out.print(image1);
+      RunLengthEncoding rle1 = new RunLengthEncoding(image1);
+      rle1.check();
+      System.out.println("Testing getWidth/getHeight on a 3x3 encoding.");
+      doTest(rle1.getWidth() == 3 && rle1.getHeight() == 3,
+              "RLE1 has wrong dimensions");
 
     System.out.println("Testing toPixImage() on a 3x3 encoding.");
     doTest(image1.equals(rle1.toPixImage()),
@@ -321,8 +382,8 @@ public class RunLengthEncoding implements Iterable {
            /*
                        array2PixImage(new int[][] { { 42, 3, 6 },
                                                     { 1, 4, 7 },
-                                                    { 2, 5, 8 } })),
-           */
+                                                    { 2, 5, 8 } })),*/
+
            "Setting RLE1[0][0] = 42 fails.");
 
     System.out.println("Testing setPixel() on a 3x3 encoding.");

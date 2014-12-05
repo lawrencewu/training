@@ -50,6 +50,9 @@ public class PixImage {
       }
   }
 
+   public Pixel[][] getPixels(){
+       return this.pixels;
+   }
   /**
    * getWidth() returns the width of the image.
    *
@@ -490,8 +493,16 @@ public class PixImage {
             return this.blue;
         }
 
+        public static Color createBlackColor(){
+            return new Color((short)0,(short)0,(short)0);
+        }
+
         public boolean equals(Color c){
             return this.red==c.getRed() && this.green == c.green && this.blue == c.blue;
+        }
+
+        public String toString(){
+            return "{red, green, blue}" + red + "," + green + "," + blue;
         }
     }
 

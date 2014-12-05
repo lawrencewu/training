@@ -37,13 +37,13 @@ public class RunIterator implements Iterator {
    *  These variables MUST be private.
    */
 
-
+   private Run current;
 
 
   /**
    *  RunIterator() constructs a new iterator starting with a specified run.
    *
-   *  @param node the run where this iterator starts.
+   *  @param run the run where this iterator starts.
    */
   // Unlike all the other methods we have asked you to write, the RunIterator()
   // constructor does not have a predefined signature, because no outside
@@ -54,7 +54,8 @@ public class RunIterator implements Iterator {
   // constructor that you want so that your RunLengthEncoding.iterator()
   // implementation can construct a RunIterator that points to the first run of
   // the encoding.
-  RunIterator() {
+  RunIterator(Run run) {
+      this.current = run;
     // Your solution here.  You may add parameters to the method signature.
   }
 
@@ -65,8 +66,9 @@ public class RunIterator implements Iterator {
    *  @return true if the iterator has more elements.
    */
   public boolean hasNext() {
-    // Replace the following line with your solution.
-    return false;
+    // Replace the following line wit0h your solution.
+
+    return current != null;
   }
 
   /**
@@ -94,9 +96,13 @@ public class RunIterator implements Iterator {
     // Construct a new array of 4 ints, fill in its values, and return it.
     // Don't forget to advance the RunIterator's pointer so that the next
     // call to next() will return the subsequent run.
-
     // Replace the following line with your solution.
-    return new int[4];
+    if(!hasNext())
+        throw new NoSuchElementException("No more element");
+
+      int[] arr = {current.getLength(), current.getColor().getRed(), current.getColor().getGreen(), current.getColor().getBlue()};
+      current = current.getNext();
+    return arr;
   }
 
   /**
