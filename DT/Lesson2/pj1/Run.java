@@ -20,6 +20,10 @@ public class Run {
         return length;
     }
 
+    public void setLength(int length){
+        this.length = length;
+    }
+
     public void setPrev(Run prev) {
         this.prev = prev;
     }

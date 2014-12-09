@@ -161,7 +161,7 @@ public class RunLengthEncoding implements Iterable {
     // Replace the following line with your solution.
       PixImage image = new PixImage(width, height);
       RunIterator iterator = iterator();
-      int x = 0, y =0, mod = 0;
+      int x = 0, y =0 ;
       while (iterator.hasNext()){
           int[] arr = iterator.next();
           for (int i = 0; i < arr[0]; i++) {
@@ -284,10 +284,86 @@ public class RunLengthEncoding implements Iterable {
   public void setPixel(int x, int y, short red, short green, short blue) {
     // Your solution here, but you should probably leave the following line
     //   at the end.
+      RunIterator iterator = iterator();
+      Run current = runList.head;
+      int xindex = -1, yindex = -1;
+      int index = 0, position = 0;
+      boolean exec = true;
+      while (current != null && exec){
+          index ++;
+          position = 0;
+          for (int i = 0; i < current.getLength(); i++) {
+              if(xindex < width -1 ){
+                  xindex ++;
+              }else {
+                  xindex = 0;
+                  yindex++;
+              }
+              position ++;
+              if(x == xindex && y == yindex) {
+                  savePixel(index, position, current, green, red, blue);
+                  exec = false;
+                  break;
+              }
+          }
+          current = current.getNext();
+      }
 
     check();
   }
 
+  public void savePixel(int index,int position, Run current, short green, short red, short blue){
+      PixImage.Color c = new PixImage.Color(green, red, blue);
+      splitRun(index,position, current, c);
+      merge();
+  }
+
+  public void splitRun(int index, int position, Run current, PixImage.Color c){
+      Run run = new Run(c, 1);
+      if(index == 1){
+          current.getNext().setPrev(run);
+          run.setNext(current.getNext());
+          return;
+      }
+      if(current.getColor().equals(c)){
+          current.setLength(current.getLength() + 1);
+      }
+      else if(position == 1){
+          current.setLength(current.getLength()-1);
+          current.getPrev().setNext(run);
+          run.setPrev(current.getPrev());
+          run.setNext(current);
+          current.setPrev(run);
+      }else if(position == current.getLength()){
+          current.setLength(current.getLength()-1);
+          run.setNext(current.getNext());
+          current.getNext().setPrev(run);
+          current.setNext(run);
+          run.setPrev(current);
+      }else{
+          Run r = new Run(current.getColor(),current.getLength() - position);
+          current.setLength(position - 1);
+          run.setNext(r);
+          r.setPrev(run);
+          current.setNext(r);
+          run.setPrev(current);
+          r.setNext(current.getNext());
+      }
+  }
+
+  public void merge(){
+      Run prev = runList.head;
+      while(prev != null){
+         Run current = prev.getNext();
+         if(current == null) break;
+         if(current.getColor().equals(prev.getColor())){
+             prev.setLength(current.getLength() + prev.getLength());
+             prev.setNext(current.getNext());
+             current.getNext().setPrev(prev);
+         }
+         prev = current;
+      }
+  }
 
   /**
    * TEST CODE:  YOU DO NOT NEED TO FILL IN ANY METHODS BELOW THIS POINT.

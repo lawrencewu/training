@@ -34,6 +34,10 @@ public class RunList {
         return size;
     }
 
+    public void addAtIndex(int index, Run run){
+
+    }
+
     private void check(PixImage.Color c, int length){
         if(c.getBlue() <0 || c.getBlue() > 255 || c.getRed() < 0 || c.getRed() > 255 || c.getGreen() < 0 ||c.getGreen() > 255){
             throw new IllegalArgumentException("Color's value should be 0...255");
