@@ -76,5 +76,4 @@ public abstract class List {
    *  @return a String representation of this List.
    */
   public abstract String toString();
-
 }

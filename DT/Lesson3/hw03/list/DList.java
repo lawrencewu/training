@@ -52,6 +52,9 @@ public class DList {
    */
   public DList() {
     //  Your solution here.
+    head = newNode(null,null,null);
+    head.next = head;
+    head.prev = head;
   }
 
   /**
@@ -79,6 +82,11 @@ public class DList {
    */
   public void insertFront(Object item) {
     // Your solution here.
+    DListNode current = front();
+    DListNode node = newNode(item,head,current);
+    current.prev = node;
+    head.next = node;
+    size ++;
   }
 
   /**
@@ -88,6 +96,11 @@ public class DList {
    */
   public void insertBack(Object item) {
     // Your solution here.
+    DListNode last =  back();
+    DListNode node = newNode(item, last, head);
+    head.prev = node;
+    last.next = node;
+    size ++;
   }
 
   /**
@@ -101,6 +114,8 @@ public class DList {
    */
   public DListNode front() {
     // Your solution here.
+    if(isEmpty()) return null;
+    return head.next;
   }
 
   /**
@@ -114,6 +129,8 @@ public class DList {
    */
   public DListNode back() {
     // Your solution here.
+    if(isEmpty()) return null;
+    return head.prev;
   }
 
   /**
@@ -128,6 +145,8 @@ public class DList {
    */
   public DListNode next(DListNode node) {
     // Your solution here.
+    if(checkArgument(node)) return null;
+    return node.next;
   }
 
   /**
@@ -142,6 +161,9 @@ public class DList {
    */
   public DListNode prev(DListNode node) {
     // Your solution here.
+    if(checkArgument(node)) return null;
+    if(head.equals(node.prev)) return null;
+    return node.prev;
   }
 
   /**
@@ -153,6 +175,12 @@ public class DList {
    */
   public void insertAfter(Object item, DListNode node) {
     // Your solution here.
+    if(checkArgument(node)) return;
+      DListNode next = node.next;
+      DListNode n = new DListNode(item, node, next);
+      next.prev = n;
+      node.next = n;
+      size++;
   }
 
   /**
@@ -164,6 +192,12 @@ public class DList {
    */
   public void insertBefore(Object item, DListNode node) {
     // Your solution here.
+    if(checkArgument(node)) return;
+      DListNode p = node.prev;
+      DListNode n = new DListNode(item,p, node);
+      p.next = n;
+      node.prev = n;
+      size ++;
   }
 
   /**
@@ -172,6 +206,13 @@ public class DList {
    */
   public void remove(DListNode node) {
     // Your solution here.
+    if(checkArgument(node)) return;
+      DListNode prev = node.prev;
+      prev.next = node.next;
+      node.next.prev = prev;
+      node.next = null;
+      node.prev = null;
+      size --;
   }
 
   /**
@@ -190,5 +231,14 @@ public class DList {
       current = current.next;
     }
     return result + "]";
+  }
+
+  private boolean checkArgument(Object arg){
+    boolean result = false;
+    if(arg == null){
+       result = true;
+       throw new IllegalArgumentException("Argument should not be null");
+     }
+    return result;
   }
 }
