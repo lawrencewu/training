@@ -1,6 +1,9 @@
 /* Set.java */
 
-import list.*;
+import list.DList;
+import list.InvalidNodeException;
+import list.List;
+import list.ListNode;
 
 /**
  *  A Set is a collection of Comparable elements stored in sorted order.
@@ -9,6 +12,7 @@ import list.*;
 public class Set {
   /* Fill in the data fields here. */
 
+  private List list;
   /**
    * Set ADT invariants:
    *  1)  The Set's elements must be precisely the elements of the List.
@@ -16,7 +20,6 @@ public class Set {
    *      must always be sorted in ascending order.
    *  3)  No two elements in the List may be equal according to compareTo().
    **/
-
   /**
    *  Constructs an empty Set. 
    *
@@ -24,6 +27,7 @@ public class Set {
    **/
   public Set() { 
     // Your solution here.
+    list = new DList();
   }
 
   /**
@@ -33,7 +37,7 @@ public class Set {
    **/
   public int cardinality() {
     // Replace the following line with your solution.
-    return 0;
+    return list.length();
   }
 
   /**
@@ -46,6 +50,33 @@ public class Set {
    **/
   public void insert(Comparable c) {
     // Your solution here.
+    if (list.isEmpty()) {
+      list.insertFront(c);
+      return;
+    }
+    try {
+      if (c.compareTo(list.front().item()) < 0) {
+        list.insertFront(c);
+        return;
+      }
+      if (c.compareTo(list.back().item()) > 0) {
+        list.insertBack(c);
+        return;
+      }
+      ListNode node = list.front();
+      while (node.isValidNode()) {
+        int r  = c.compareTo(node.item());
+        if (r == 0)
+          return;
+        if (r < 0) {
+          node.insertBefore(c);
+          return;
+        }
+        else
+          node = node.next();
+      }
+    } catch (InvalidNodeException e) {
+    }
   }
 
   /**
@@ -65,6 +96,31 @@ public class Set {
    **/
   public void union(Set s) {
     // Your solution here.
+    ListNode node = list.front();
+    ListNode sNode = s.list.front();
+    try {
+      while (node.isValidNode() && sNode.isValidNode()){
+        int result = ((Comparable)node.item()).compareTo((Comparable)sNode.item());
+        if (result == 0){
+           node = node.next();
+           sNode = sNode.next();
+          continue;
+        }else if(result > 0){
+          node.insertBefore(sNode.item());
+          sNode = sNode.next();
+        }else{
+          node = node.next();
+          continue;
+        }
+      }
+      while (sNode.isValidNode()){
+         list.insertBack(sNode.item());
+         sNode = sNode.next();
+      }
+
+    } catch (InvalidNodeException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -82,6 +138,33 @@ public class Set {
    **/
   public void intersect(Set s) {
     // Your solution here.
+    ListNode node = list.front();
+    ListNode sNode = s.list.front();
+    try {
+        while (node.isValidNode() && sNode.isValidNode()){
+          int result = ((Comparable)node.item()).compareTo((Comparable)sNode.item());
+          if(result == 0){
+             node = node.next();
+             sNode = sNode.next();
+             continue;
+          }else if(result > 0){
+            sNode = sNode.next();
+          }else {
+            ListNode t = sNode.next();
+            node.remove();
+            node = t;
+            continue;
+          }
+        }
+
+        while (node.isValidNode()){
+           ListNode t = node.next();
+           t.remove();
+           node = t;
+        }
+    }catch (InvalidNodeException e){
+
+    }
   }
 
   /**
@@ -101,7 +184,20 @@ public class Set {
    **/
   public String toString() {
     // Replace the following line with your solution.
-    return "";
+    if(list.isEmpty())
+      return "{  }";
+    ListNode node = list.front();
+    StringBuilder sb = new StringBuilder();
+    sb.append("{ ");
+    while (node.isValidNode()){
+      try {
+        sb.append(node.item() + " ");
+        node = node.next();
+      } catch (InvalidNodeException e) {
+        e.printStackTrace();
+      }
+    }
+    return sb.append("}").toString();
   }
 
   public static void main(String[] argv) {
