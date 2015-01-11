@@ -59,7 +59,11 @@ public class DList extends List {
   public DList() {
     // Your solution here.  Similar to Homework 4, but now you need to specify
     //   the `list' field (second parameter) as well.
+    head = new DListNode(null,null, null, null);
+    head.next = head;
+    head.prev = head;
   }
+
 
   /**
    *  insertFront() inserts an item at the front of this DList.
@@ -71,6 +75,12 @@ public class DList extends List {
   public void insertFront(Object item) {
     // Your solution here.  Similar to Homework 4, but now you need to specify
     //   the `list' field (second parameter) as well.
+
+    DListNode current = (DListNode)front();
+    DListNode node = newNode(item, this, head, current);
+    current.prev = node;
+    head.next = node;
+    size ++;
   }
 
   /**
@@ -83,6 +93,11 @@ public class DList extends List {
   public void insertBack(Object item) {
     // Your solution here.  Similar to Homework 4, but now you need to specify
     //   the `list' field (second parameter) as well.
+    DListNode current = (DListNode)back();
+    DListNode node = newNode(item, this, current, head);
+    head.prev = node;
+    current.next = node;
+    size ++;
   }
 
   /**
@@ -97,6 +112,7 @@ public class DList extends List {
    *  Performance:  runs in O(1) time.
    */
   public ListNode front() {
+
     return head.next;
   }
 
@@ -127,7 +143,7 @@ public class DList extends List {
   public String toString() {
     String result = "[  ";
     DListNode current = head.next;
-    while (current != head) {
+    while (current != head && current != null) {
       result = result + current.item + "  ";
       current = current.next;
     }
