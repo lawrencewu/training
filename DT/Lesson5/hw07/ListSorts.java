@@ -47,25 +47,20 @@ public class ListSorts {
     Comparable v1 = null, v2 = null;
     try {
       while(!q1.isEmpty() && !q2.isEmpty()) {
-          if (v1 == null)
-            v1 = (Comparable) q1.dequeue();
-          if (v2 == null)
-            v2 = (Comparable) q2.dequeue();
+            v1 = (Comparable) q1.front();
+            v2 = (Comparable) q2.front();
           if (v1.compareTo(v2) == 0) {
             result.enqueue(v1);
             result.enqueue(v2);
-            v1 = null;
-            v2 = null;
-            continue;
+            q1.dequeue();
+            q2.dequeue();
           }
           if (v1.compareTo(v2) < 0) {
             result.enqueue(v1);
-            v1 = null;
-            continue;
-          } else {
+            q1.dequeue();
+          }
+          if (v1.compareTo(v2) > 0) {
             result.enqueue(v2);
-            v2 = null;
-            continue;
           }
         }
 
@@ -158,8 +153,12 @@ public class ListSorts {
     int position = r.nextInt(q.size());
     Comparable pivot = (Comparable)q.nth(position);
     partition(q, pivot, qSmall, qEquals, qLarge);
-    quickSort(qSmall);
-    quickSort(qLarge);
+    if(qSmall.size() > 1) {
+      quickSort(qSmall);
+    }
+    if(qLarge.size() > 1) {
+      quickSort(qLarge);
+    }
     q.append(qSmall);
     q.append(qEquals);
     q.append(qLarge);
